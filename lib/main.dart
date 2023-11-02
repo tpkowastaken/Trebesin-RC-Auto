@@ -22,6 +22,7 @@ void bluetooth(BuildContext context) async {
   await Permission.bluetoothAdvertise.request();
   await Permission.bluetoothConnect.request();
   await Permission.bluetoothScan.request();
+  await Permission.location.request();
   final BluetoothDevice? selectedDevice = await Navigator.of(context).push(
     MaterialPageRoute(
       builder: (context) {
