@@ -1,17 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void bluetooth() async {
+  if (!await Permission.bluetooth.request().isGranted) {
+    await Permission.bluetooth.request();
+  }
+  if (!await Permission.bluetoothAdvertise.request().isGranted) {
+    await Permission.bluetoothAdvertise.request();
+  }
+  if (!await Permission.bluetoothConnect.request().isGranted) {
+    await Permission.bluetoothConnect.request();
+  }
+  if (!await Permission.bluetoothScan.request().isGranted) {
+    await Permission.bluetoothScan.request();
+  }
+  if (!await Permission.bluetooth.request().isGranted) {
+    return;
+  }
+  if (!await Permission.bluetoothAdvertise.request().isGranted) {
+    return;
+  }
+  if (!await Permission.bluetoothConnect.request().isGranted) {
+    return;
+  }
+  if (!await Permission.bluetoothScan.request().isGranted) {
+    return;
+  }
+
   FlutterBlue flutterBlue = FlutterBlue.instance;
-  flutterBlue.startScan(timeout: Duration(seconds: 4));
+  flutterBlue.startScan(timeout: const Duration(seconds: 4));
 
   // Listen to scan results
   var subscription = flutterBlue.scanResults.listen((results) {
     // do something with scan results
     for (ScanResult r in results) {
-      print('${r.device.name} found! rssi: ${r.rssi}');
+      if (r.device.id.id == "00:22:12:01:13:6A") {
+        print("found");
+        print("found");
+        print("found");
+        print("found");
+        print("found");
+      }
+      if (r.device.name.trim() != "") {
+        print('${r.device.name} found! rssi: ${r.rssi}');
+      }
     }
   });
+  /*
+    // Connect to the device
+  await device.connect();
+
+  // Disconnect from device
+  device.disconnect();*/
 }
 
 void main() {
