@@ -97,6 +97,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        splashFactory: NoSplash.splashFactory,
+        iconButtonTheme: const IconButtonThemeData(
+          style: ButtonStyle(overlayColor: MaterialStatePropertyAll(Colors.transparent)),
+        ),
       ),
       home: const MyHomePage(),
     );
@@ -112,6 +118,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   double x = 0, y = 0, z = 0;
+  String direction = "";
+  double _value = 0;
+  bool steeringButtonsDissabled = true;
+  bool ableToDrive = false;
 
   @override
   void initState() {
@@ -145,9 +155,6 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
-  String direction = "";
-  double _value = 0;
-  bool steeringButtonsDissabled = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -214,11 +221,17 @@ class _MyHomePageState extends State<MyHomePage> {
                       children: [
                         //power button
                         IconButton(
-                          icon: const Icon(
+                          icon: Icon(
                             Symbols.power_settings_new,
                             size: 40,
+                            color: ableToDrive ? Colors.green : Colors.red,
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            setState(() {
+                              _value = 0;
+                              ableToDrive = !ableToDrive;
+                            });
+                          },
                         ),
                         // vertical divider
                         const Padding(
@@ -265,6 +278,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                   ),
+                  //slider
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -308,11 +322,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                 max: 1,
                                 value: _value,
                                 onChanged: (value) {
-                                  setState(() {
-                                    _value = value;
-                                  });
-                                  if (kDebugMode) {
-                                    print(value);
+                                  if (ableToDrive) {
+                                    setState(() {
+                                      _value = value;
+                                    });
+                                    if (kDebugMode) {
+                                      print(value);
+                                    }
                                   }
                                 },
                               ),
@@ -352,12 +368,13 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ],
           ),
+          //steering Buttons
           Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: steeringButtonsDissabled
+                child: steeringButtonsDissabled || !ableToDrive
                     ? const Row(
                         children: [
                           Icon(
@@ -386,7 +403,6 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                           ),
                           //steer right
-
                           GestureDetector(
                             onTapDown: (details) {},
                             onTapUp: (details) {},
