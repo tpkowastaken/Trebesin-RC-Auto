@@ -7,6 +7,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:trebesin_rc_auto/select_bonded_device_page.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 BluetoothConnection? connection;
 void send(String text) async {
@@ -92,7 +93,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Trebesin RC Auto Ovladac',
       debugShowCheckedModeBanner: false,
-      debugShowMaterialGrid: false,
+      //debugShowMaterialGrid: true,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -111,6 +112,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   double x = 0, y = 0, z = 0;
+
   @override
   void initState() {
     gyroscopeEvents.listen((GyroscopeEvent event) {
@@ -151,107 +153,199 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         actions: [
           IconButton(
-            icon: const Icon(Icons.bluetooth),
+            icon: const Icon(Symbols.bluetooth),
             onPressed: () => bluetooth(context),
           ),
         ],
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text("RC Auto Ovladač"),
       ),
-      body: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
+      body: Stack(
         children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(width: 200),
-              Text(
-                "Ovládání",
-                style: Theme.of(context).textTheme.titleLarge,
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 25.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const SizedBox(width: 200),
+                  Text(
+                    "Ovládání",
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  Text(
+                    "Připojeno: ${connection?.isConnected ?? false}",
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  Text(
+                    "Gyroskop: $direction",
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                  ElevatedButton(
+                      onPressed: () {
+                        x = 0;
+                        y = 0;
+                        z = 0;
+                      },
+                      child: const Text("Reset")),
+                ],
               ),
-              Text(
-                "Připojeno: ${connection?.isConnected ?? false}",
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Text(
-                "Gyroskop: $direction",
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
-              ElevatedButton(
-                  onPressed: () {
-                    x = 0;
-                    y = 0;
-                    z = 0;
-                  },
-                  child: const Text("Reset")),
-            ],
+            ),
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              //stop button
-              MaterialButton(
-                shape: const CircleBorder(side: BorderSide(color: Colors.transparent)),
-                padding: const EdgeInsets.all(0),
-                onPressed: () {
-                  setState(() {
-                    _value = 0;
-                  });
-                },
-                child: const Icon(
-                  Icons.stop_circle_outlined,
-                  size: 50,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: IntrinsicHeight(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 1.5,
+                        style: BorderStyle.solid,
+                        color: Colors.black38,
+                      ),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(
+                            Symbols.power_settings_new,
+                            size: 40,
+                          ),
+                          onPressed: () {},
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 14.0),
+                          child: VerticalDivider(
+                            width: 1,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Symbols.swap_horiz,
+                            size: 40,
+                          ),
+                          onPressed: () {},
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
+              //stop button
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  RotatedBox(
-                    quarterTurns: 3,
-                    child: Slider.adaptive(
-                      min: -1,
-                      max: 1,
-                      value: _value,
-                      onChanged: (value) {
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: MaterialButton(
+                      shape: const CircleBorder(side: BorderSide(color: Colors.transparent)),
+                      padding: const EdgeInsets.all(0),
+                      onPressed: () {
                         setState(() {
-                          _value = value;
+                          _value = 0;
                         });
-                        if (kDebugMode) {
-                          print(value);
-                        }
                       },
+                      child: const Icon(
+                        Icons.stop_circle_outlined,
+                        size: 50,
+                      ),
                     ),
                   ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Symbols.stat_3,
+                                size: 75,
+                                color: Colors.orange,
+                              ),
+                              SizedBox(
+                                width: 40,
+                                child: Divider(
+                                  color: Colors.black26,
+                                  thickness: 1.5,
+                                ),
+                              ),
+                              Icon(
+                                Symbols.stat_minus_3,
+                                size: 75,
+                                color: Colors.blue,
+                              ),
+                            ],
+                          ),
+                          RotatedBox(
+                            quarterTurns: 3,
+                            child: SizedBox(
+                              width: 225,
+                              child: Slider.adaptive(
+                                thumbColor: Theme.of(context).colorScheme.primary,
+                                activeColor: Colors.transparent,
+                                inactiveColor: Colors.transparent,
+                                overlayColor: const MaterialStatePropertyAll(Colors.transparent),
+                                min: -1,
+                                max: 1,
+                                value: _value,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _value = value;
+                                  });
+                                  if (kDebugMode) {
+                                    print(value);
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
 
-                  //up
-                  //MaterialButton(
-                  //  shape: const CircleBorder(side: BorderSide(color: Colors.transparent)),
-                  //  padding: const EdgeInsets.all(0),
-                  //  onPressed: () {
-                  //    send("W");
-                  //  },
-                  //  child: const Icon(
-                  //    Icons.arrow_circle_up,
-                  //    size: 90,
-                  //  ),
-                  //),
+                      //up
+                      //MaterialButton(
+                      //  shape: const CircleBorder(side: BorderSide(color: Colors.transparent)),
+                      //  padding: const EdgeInsets.all(0),
+                      //  onPressed: () {
+                      //    send("W");
+                      //  },
+                      //  child: const Icon(
+                      //    Symbols.arrow_circle_up,
+                      //    size: 90,
+                      //  ),
+                      //),
 
-                  //down
-                  //MaterialButton(
-                  //  shape: const CircleBorder(side: BorderSide(color: Colors.transparent)),
-                  //  padding: const EdgeInsets.all(0),
-                  //  onPressed: () {
-                  //    send("B");
-                  //  },
-                  //  child: const Icon(
-                  //    Icons.arrow_circle_down,
-                  //    size: 90,
-                  //  ),
-                  //),
+                      //down
+                      //MaterialButton(
+                      //  shape: const CircleBorder(side: BorderSide(color: Colors.transparent)),
+                      //  padding: const EdgeInsets.all(0),
+                      //  onPressed: () {
+                      //    send("B");
+                      //  },
+                      //  child: const Icon(
+                      //    Symbols.arrow_circle_down,
+                      //    size: 90,
+                      //  ),
+                      //),
+                    ],
+                  ),
                 ],
               ),
             ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [],
           ),
         ],
       ),
