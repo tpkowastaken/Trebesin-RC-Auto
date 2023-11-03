@@ -25,7 +25,7 @@ void bluetooth(BuildContext context) async {
   await Permission.bluetoothConnect.request();
   await Permission.bluetoothScan.request();
   await Permission.location.request();
-  // ignore: use_build_context_synchronously
+  if (!context.mounted) return;
   final BluetoothDevice? selectedDevice = await Navigator.of(context).push(
     MaterialPageRoute(
       builder: (context) {
@@ -35,6 +35,9 @@ void bluetooth(BuildContext context) async {
   );
   BluetoothDevice? server = selectedDevice;
   if (server == null) {
+    if (kDebugMode) {
+      print('Connect -> no device selected');
+    }
     if (kDebugMode) {
       print('Connect -> no device selected');
     }
@@ -61,6 +64,9 @@ void bluetooth(BuildContext context) async {
         if (kDebugMode) {
           print('Disconnected!');
         }
+        if (kDebugMode) {
+          print('Disconnected!');
+        }
       });
     }).catchError((error) {
       if (kDebugMode) {
@@ -69,6 +75,9 @@ void bluetooth(BuildContext context) async {
       }
     });
   } else {
+    if (kDebugMode) {
+      print('Connect -> no device selected');
+    }
     if (kDebugMode) {
       print('Connect -> no device selected');
     }

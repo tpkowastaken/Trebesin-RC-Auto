@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
-import 'bluettoth_device_list_entry.dart';
+import './bluetooth_device_entry.dart';
 
 class SelectBondedDevicePage extends StatefulWidget {
   /// If true, on page start there is performed discovery upon the bonded devices.
@@ -13,13 +13,10 @@ class SelectBondedDevicePage extends StatefulWidget {
   const SelectBondedDevicePage({super.key, this.checkAvailability = true});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _SelectBondedDevicePage createState() => _SelectBondedDevicePage();
+  State<SelectBondedDevicePage> createState() => _SelectBondedDevicePage();
 }
 
 enum _DeviceAvailability {
-  // ignore: unused_field
-  no,
   maybe,
   yes,
 }
@@ -29,11 +26,7 @@ class _DeviceWithAvailability {
   _DeviceAvailability availability;
   int? rssi;
 
-  _DeviceWithAvailability(
-    this.device,
-    this.availability,
-    /*[this.rssi]*/
-  );
+  _DeviceWithAvailability(this.device, this.availability);
 }
 
 class _SelectBondedDevicePage extends State<SelectBondedDevicePage> {
@@ -83,10 +76,10 @@ class _SelectBondedDevicePage extends State<SelectBondedDevicePage> {
       setState(() {
         Iterator i = devices.iterator;
         while (i.moveNext()) {
-          var device = i.current;
-          if (device.device == r.device) {
-            device.availability = _DeviceAvailability.yes;
-            device.rssi = r.rssi;
+          var currentDevice = i.current;
+          if (currentDevice.device == r.device) {
+            currentDevice.availability = _DeviceAvailability.yes;
+            currentDevice.rssi = r.rssi;
           }
         }
       });
@@ -110,12 +103,12 @@ class _SelectBondedDevicePage extends State<SelectBondedDevicePage> {
   @override
   Widget build(BuildContext context) {
     List<BluetoothDeviceListEntry> list = devices
-        .map((device) => BluetoothDeviceListEntry(
-              device: device.device,
-              rssi: device.rssi,
-              enabled: device.availability == _DeviceAvailability.yes,
+        .map((currentDevice) => BluetoothDeviceListEntry(
+              device: currentDevice.device,
+              rssi: currentDevice.rssi,
+              enabled: currentDevice.availability == _DeviceAvailability.yes,
               onTap: () {
-                Navigator.of(context).pop(device.device);
+                Navigator.of(context).pop(currentDevice.device);
               },
             ))
         .toList();
