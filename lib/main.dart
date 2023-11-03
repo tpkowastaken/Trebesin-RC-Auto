@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:sensors_plus/sensors_plus.dart';
-import 'package:trebesin_rc_auto/SelectBondedDevicePage.dart';
+import 'package:trebesin_rc_auto/select_bonded_device_page.dart';
 
 BluetoothConnection? connection;
 void send(String text) async {
@@ -163,7 +163,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     y = 0;
                     z = 0;
                   },
-                  child: const Text("Reset")),
+                  child: Text("Reset")),
             ],
           ),
           Row(

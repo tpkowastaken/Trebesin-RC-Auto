@@ -3,22 +3,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
-import './BluetoothDeviceListEntry.dart';
+import './bluetooth_device_entry.dart';
 
 class SelectBondedDevicePage extends StatefulWidget {
   /// If true, on page start there is performed discovery upon the bonded devices.
   /// Then, if they are not avaliable, they would be disabled from the selection.
   final bool checkAvailability;
 
-  const SelectBondedDevicePage({super.key, this.checkAvailability = true});
+  const SelectBondedDevicePage({this.checkAvailability = true});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _SelectBondedDevicePage createState() => _SelectBondedDevicePage();
+  _SelectBondedDevicePage createState() => new _SelectBondedDevicePage();
 }
 
 enum _DeviceAvailability {
-  // ignore: unused_field
   no,
   maybe,
   yes,
@@ -79,10 +77,10 @@ class _SelectBondedDevicePage extends State<SelectBondedDevicePage> {
       setState(() {
         Iterator i = devices.iterator;
         while (i.moveNext()) {
-          var device = i.current;
-          if (device.device == r.device) {
-            device.availability = _DeviceAvailability.yes;
-            device.rssi = r.rssi;
+          var _device = i.current;
+          if (_device.device == r.device) {
+            _device.availability = _DeviceAvailability.yes;
+            _device.rssi = r.rssi;
           }
         }
       });
@@ -106,24 +104,24 @@ class _SelectBondedDevicePage extends State<SelectBondedDevicePage> {
   @override
   Widget build(BuildContext context) {
     List<BluetoothDeviceListEntry> list = devices
-        .map((device) => BluetoothDeviceListEntry(
-              device: device.device,
-              rssi: device.rssi,
-              enabled: device.availability == _DeviceAvailability.yes,
+        .map((_device) => BluetoothDeviceListEntry(
+              device: _device.device,
+              rssi: _device.rssi,
+              enabled: _device.availability == _DeviceAvailability.yes,
               onTap: () {
-                Navigator.of(context).pop(device.device);
+                Navigator.of(context).pop(_device.device);
               },
             ))
         .toList();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Select device'),
+        title: Text('Select device'),
         actions: <Widget>[
           _isDiscovering
               ? FittedBox(
                   child: Container(
-                    margin: const EdgeInsets.all(16.0),
-                    child: const CircularProgressIndicator(
+                    margin: new EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(
                         Colors.white,
                       ),
@@ -131,7 +129,7 @@ class _SelectBondedDevicePage extends State<SelectBondedDevicePage> {
                   ),
                 )
               : IconButton(
-                  icon: const Icon(Icons.replay),
+                  icon: Icon(Icons.replay),
                   onPressed: _restartDiscovery,
                 )
         ],
