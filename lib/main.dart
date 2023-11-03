@@ -147,6 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String direction = "";
   double _value = 0;
+  bool steeringButtonsDissabled = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -211,6 +212,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     child: Row(
                       children: [
+                        //power button
                         IconButton(
                           icon: const Icon(
                             Symbols.power_settings_new,
@@ -218,6 +220,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           onPressed: () {},
                         ),
+                        // vertical divider
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 14.0),
                           child: VerticalDivider(
@@ -225,12 +228,17 @@ class _MyHomePageState extends State<MyHomePage> {
                             color: Colors.grey,
                           ),
                         ),
+                        // switch steering mode button
                         IconButton(
                           icon: const Icon(
                             Symbols.swap_horiz,
                             size: 40,
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            setState(() {
+                              steeringButtonsDissabled = !steeringButtonsDissabled;
+                            });
+                          },
                         ),
                       ],
                     ),
@@ -349,30 +357,48 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTapDown: (details) {},
-                      onTapUp: (details) {},
-                      onTapCancel: () {},
-                      child: const Icon(
-                        Symbols.arrow_circle_left_rounded,
-                        size: 100,
-                        color: Colors.black,
+                child: steeringButtonsDissabled
+                    ? const Row(
+                        children: [
+                          Icon(
+                            Symbols.arrow_circle_left_rounded,
+                            size: 100,
+                            color: Colors.black26,
+                          ),
+                          Icon(
+                            Symbols.arrow_circle_right_rounded,
+                            size: 100,
+                            color: Colors.black26,
+                          ),
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          //steer left
+                          GestureDetector(
+                            onTapDown: (details) {},
+                            onTapUp: (details) {},
+                            onTapCancel: () {},
+                            child: const Icon(
+                              Symbols.arrow_circle_left_rounded,
+                              size: 100,
+                              color: Colors.black,
+                            ),
+                          ),
+                          //steer right
+
+                          GestureDetector(
+                            onTapDown: (details) {},
+                            onTapUp: (details) {},
+                            onTapCancel: () {},
+                            child: const Icon(
+                              Symbols.arrow_circle_right_rounded,
+                              size: 100,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    GestureDetector(
-                      onTapDown: (details) {},
-                      onTapUp: (details) {},
-                      onTapCancel: () {},
-                      child: const Icon(
-                        Symbols.arrow_circle_right_rounded,
-                        size: 100,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
-                ),
               ),
             ],
           ),
