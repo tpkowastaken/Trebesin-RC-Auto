@@ -182,12 +182,13 @@ class _MyHomePageState extends State<MyHomePage> {
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
                   ElevatedButton(
-                      onPressed: () {
-                        x = 0;
-                        y = 0;
-                        z = 0;
-                      },
-                      child: const Text("Reset")),
+                    onPressed: () {
+                      x = 0;
+                      y = 0;
+                      z = 0;
+                    },
+                    child: const Text("Reset"),
+                  ),
                 ],
               ),
             ),
@@ -317,7 +318,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       //  shape: const CircleBorder(side: BorderSide(color: Colors.transparent)),
                       //  padding: const EdgeInsets.all(0),
                       //  onPressed: () {
-                      //    send("W");
+                      //  send("W");
                       //  },
                       //  child: const Icon(
                       //    Symbols.arrow_circle_up,
@@ -343,9 +344,37 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ],
           ),
-          Row(
+          Column(
             mainAxisAlignment: MainAxisAlignment.end,
-            children: [],
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTapDown: (details) {},
+                      onTapUp: (details) {},
+                      onTapCancel: () {},
+                      child: const Icon(
+                        Symbols.arrow_circle_left_rounded,
+                        size: 100,
+                        color: Colors.black,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTapDown: (details) {},
+                      onTapUp: (details) {},
+                      onTapCancel: () {},
+                      child: const Icon(
+                        Symbols.arrow_circle_right_rounded,
+                        size: 100,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
