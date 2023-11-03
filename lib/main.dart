@@ -2,10 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:sensors_plus/sensors_plus.dart';
-import 'package:trebesin_rc_auto/SelectBondedDevicePage.dart';
+import 'package:trebesin_rc_auto/select_bonded_device_page.dart';
 
 BluetoothConnection? connection;
 void send(String text) async {
@@ -23,6 +24,7 @@ void bluetooth(BuildContext context) async {
   await Permission.bluetoothConnect.request();
   await Permission.bluetoothScan.request();
   await Permission.location.request();
+  // ignore: use_build_context_synchronously
   final BluetoothDevice? selectedDevice = await Navigator.of(context).push(
     MaterialPageRoute(
       builder: (context) {
@@ -32,7 +34,9 @@ void bluetooth(BuildContext context) async {
   );
   BluetoothDevice? server = selectedDevice;
   if (server == null) {
-    print('Connect -> no device selected');
+    if (kDebugMode) {
+      print('Connect -> no device selected');
+    }
     return;
   }
 
@@ -53,14 +57,20 @@ void bluetooth(BuildContext context) async {
         // `dispose`, `finish` or `close`, which all causes to disconnect.
         // If we except the disconnection, `onDone` should be fired as result.
         // If we didn't except this (no flag set), it means closing by remote.
-        print('Disconnected!');
+        if (kDebugMode) {
+          print('Disconnected!');
+        }
       });
     }).catchError((error) {
-      print('Cannot connect, exception occured');
-      print(error);
+      if (kDebugMode) {
+        print('Cannot connect, exception occured');
+        print(error);
+      }
     });
   } else {
-    print('Connect -> no device selected');
+    if (kDebugMode) {
+      print('Connect -> no device selected');
+    }
   }
 }
 
@@ -74,6 +84,11 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    // Set landscape orientation
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
     return MaterialApp(
       title: 'Trebesin RC Auto Ovladac',
       debugShowCheckedModeBanner: false,
@@ -127,6 +142,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   String direction = "";
+  double _value = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -140,10 +156,12 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text("RC Auto Ovladač"),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      body: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
                 "Ovládání",
@@ -166,38 +184,54 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: const Text("Reset")),
             ],
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  //up
-                  MaterialButton(
-                    shape: const CircleBorder(side: BorderSide(color: Colors.transparent)),
-                    padding: const EdgeInsets.all(0),
-                    onPressed: () {
-                      send("W");
-                    },
-                    child: const Icon(
-                      Icons.arrow_circle_up,
-                      size: 90,
+                  RotatedBox(
+                    quarterTurns: 3,
+                    child: Slider.adaptive(
+                      min: 0,
+                      max: 1,
+                      value: _value,
+                      onChanged: (value) {
+                        setState(() {
+                          _value = value;
+                        });
+                        if (kDebugMode) {
+                          print(value);
+                        }
+                      },
                     ),
                   ),
+                  //up
+                  //MaterialButton(
+                  //  shape: const CircleBorder(side: BorderSide(color: Colors.transparent)),
+                  //  padding: const EdgeInsets.all(0),
+                  //  onPressed: () {
+                  //    send("W");
+                  //  },
+                  //  child: const Icon(
+                  //    Icons.arrow_circle_up,
+                  //    size: 90,
+                  //  ),
+                  //),
 
                   //down
 
-                  MaterialButton(
-                    shape: const CircleBorder(side: BorderSide(color: Colors.transparent)),
-                    padding: const EdgeInsets.all(0),
-                    onPressed: () {
-                      send("B");
-                    },
-                    child: const Icon(
-                      Icons.arrow_circle_down,
-                      size: 90,
-                    ),
-                  ),
+                  //MaterialButton(
+                  //  shape: const CircleBorder(side: BorderSide(color: Colors.transparent)),
+                  //  padding: const EdgeInsets.all(0),
+                  //  onPressed: () {
+                  //    send("B");
+                  //  },
+                  //  child: const Icon(
+                  //    Icons.arrow_circle_down,
+                  //    size: 90,
+                  //  ),
+                  //),
                 ],
               ),
             ],
