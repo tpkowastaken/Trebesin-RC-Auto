@@ -38,8 +38,18 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  bool goLeft = false;
+  bool goRight = false;
+  bool faster = false;
+  bool slower = false;
 
   @override
   Widget build(BuildContext context) {
@@ -65,24 +75,42 @@ class MyHomePage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     //left
-                    MaterialButton(
-                      shape: const CircleBorder(side: BorderSide(color: Colors.transparent)),
-                      padding: const EdgeInsets.all(0),
-                      onPressed: () {},
-                      child: const Icon(
-                        Icons.arrow_circle_left_outlined,
-                        size: 90,
+                    GestureDetector(
+                      onTapDown: (details) {
+                        print("left");
+                      },
+                      onTapUp: (details) {
+                        print("no");
+                      },
+                      onTapCancel: () {
+                        print("loser");
+                      },
+                      child: const Material(
+                        shape: CircleBorder(side: BorderSide(color: Colors.transparent)),
+                        child: Icon(
+                          Icons.arrow_circle_left_outlined,
+                          size: 90,
+                        ),
                       ),
                     ),
 
                     //right
-                    MaterialButton(
-                      shape: const CircleBorder(side: BorderSide(color: Colors.transparent)),
-                      padding: const EdgeInsets.all(0),
-                      onPressed: () {},
-                      child: const Icon(
-                        Icons.arrow_circle_right_outlined,
-                        size: 90,
+                    GestureDetector(
+                      onTapDown: (details) {
+                        print("right");
+                      },
+                      onTapUp: (details) {
+                        print("no");
+                      },
+                      onTapCancel: () {
+                        print("loser");
+                      },
+                      child: const Material(
+                        shape: CircleBorder(side: BorderSide(color: Colors.transparent)),
+                        child: Icon(
+                          Icons.arrow_circle_right_outlined,
+                          size: 90,
+                        ),
                       ),
                     ),
                   ],
@@ -93,25 +121,42 @@ class MyHomePage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     //up
-                    MaterialButton(
-                      shape: const CircleBorder(side: BorderSide(color: Colors.transparent)),
-                      padding: const EdgeInsets.all(0),
-                      onPressed: () {},
-                      child: const Icon(
-                        Icons.arrow_circle_up,
-                        size: 90,
+                    GestureDetector(
+                      onTapDown: (details) {
+                        print("up");
+                      },
+                      onTapUp: (details) {
+                        print("no");
+                      },
+                      onTapCancel: () {
+                        print("loser");
+                      },
+                      child: const Material(
+                        shape: CircleBorder(side: BorderSide(color: Colors.transparent)),
+                        child: Icon(
+                          Icons.arrow_circle_up,
+                          size: 90,
+                        ),
                       ),
                     ),
 
                     //down
-
-                    MaterialButton(
-                      shape: const CircleBorder(side: BorderSide(color: Colors.transparent)),
-                      padding: const EdgeInsets.all(0),
-                      onPressed: () {},
-                      child: const Icon(
-                        Icons.arrow_circle_down,
-                        size: 90,
+                    GestureDetector(
+                      onTapDown: (details) {
+                        print("down");
+                      },
+                      onTapUp: (details) {
+                        print("no");
+                      },
+                      onTapCancel: () {
+                        print("loser");
+                      },
+                      child: const Material(
+                        shape: CircleBorder(side: BorderSide(color: Colors.transparent)),
+                        child: Icon(
+                          Icons.arrow_circle_down,
+                          size: 90,
+                        ),
                       ),
                     ),
                   ],
