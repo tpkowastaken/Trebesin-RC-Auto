@@ -163,7 +163,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     y = 0;
                     z = 0;
                   },
-                  child: Text("Reset")),
+                  child: const Text("Reset")),
             ],
           ),
           Row(
