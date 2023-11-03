@@ -190,6 +190,20 @@ class _MyHomePageState extends State<MyHomePage> {
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              //stop button
+              MaterialButton(
+                shape: const CircleBorder(side: BorderSide(color: Colors.transparent)),
+                padding: const EdgeInsets.all(0),
+                onPressed: () {
+                  setState(() {
+                    _value = 0;
+                  });
+                },
+                child: const Icon(
+                  Icons.stop_circle_outlined,
+                  size: 50,
+                ),
+              ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
