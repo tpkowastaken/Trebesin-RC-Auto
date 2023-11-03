@@ -120,10 +120,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
       //rough calculation, you can use
       //advance formula to calculate the orentation
-      if (z > 0) {
-        direction = "left";
-      } else if (z < 0) {
-        direction = "right";
+      if (z > (0.4)) {
+        direction = "Left";
+      } else if (z < (-0.4)) {
+        direction = "Right";
+      } else {
+        direction = "Straight";
       }
 
       setState(() {});
@@ -161,8 +163,9 @@ class _MyHomePageState extends State<MyHomePage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              const SizedBox(width: 200),
               Text(
                 "Ovládání",
                 style: Theme.of(context).textTheme.titleLarge,
@@ -185,15 +188,15 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
           Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   RotatedBox(
                     quarterTurns: 3,
                     child: Slider.adaptive(
-                      min: 0,
+                      min: -1,
                       max: 1,
                       value: _value,
                       onChanged: (value) {
@@ -206,6 +209,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       },
                     ),
                   ),
+
                   //up
                   //MaterialButton(
                   //  shape: const CircleBorder(side: BorderSide(color: Colors.transparent)),
@@ -220,7 +224,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   //),
 
                   //down
-
                   //MaterialButton(
                   //  shape: const CircleBorder(side: BorderSide(color: Colors.transparent)),
                   //  padding: const EdgeInsets.all(0),
