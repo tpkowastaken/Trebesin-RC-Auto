@@ -13,7 +13,7 @@ class SelectBondedDevicePage extends StatefulWidget {
   const SelectBondedDevicePage({super.key, this.checkAvailability = true});
 
   @override
-  _SelectBondedDevicePage createState() => _SelectBondedDevicePage();
+  State<SelectBondedDevicePage> createState() => _SelectBondedDevicePage();
 }
 
 enum _DeviceAvailability {

@@ -23,6 +23,7 @@ void bluetooth(BuildContext context) async {
   await Permission.bluetoothConnect.request();
   await Permission.bluetoothScan.request();
   await Permission.location.request();
+  if (!context.mounted) return;
   final BluetoothDevice? selectedDevice = await Navigator.of(context).push(
     MaterialPageRoute(
       builder: (context) {
@@ -32,7 +33,9 @@ void bluetooth(BuildContext context) async {
   );
   BluetoothDevice? server = selectedDevice;
   if (server == null) {
-    print('Connect -> no device selected');
+    if (kDebugMode) {
+      print('Connect -> no device selected');
+    }
     return;
   }
 
@@ -53,14 +56,22 @@ void bluetooth(BuildContext context) async {
         // `dispose`, `finish` or `close`, which all causes to disconnect.
         // If we except the disconnection, `onDone` should be fired as result.
         // If we didn't except this (no flag set), it means closing by remote.
-        print('Disconnected!');
+        if (kDebugMode) {
+          print('Disconnected!');
+        }
       });
     }).catchError((error) {
-      print('Cannot connect, exception occured');
-      print(error);
+      if (kDebugMode) {
+        print('Cannot connect, exception occured');
+      }
+      if (kDebugMode) {
+        print(error);
+      }
     });
   } else {
-    print('Connect -> no device selected');
+    if (kDebugMode) {
+      print('Connect -> no device selected');
+    }
   }
 }
 
