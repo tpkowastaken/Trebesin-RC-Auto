@@ -135,20 +135,22 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     gyroscopeEvents.listen((GyroscopeEvent event) {
-      x += event.x;
-      y += event.y;
+      // x += event.x;
+      // y += event.y;
       z += event.z;
 
       //rough calculation, you can use
       //advance formula to calculate the orentation
-      if (z > (0.4)) {
+      if (!ableToDrive || !steeringButtonsDissabled) {
+        direction = "Turned off";
+        z = 0;
+      } else if (z > (0.4)) {
         direction = "Left";
       } else if (z < (-0.4)) {
         direction = "Right";
       } else {
         direction = "Straight";
       }
-
       setState(() {});
     });
     super.initState();
