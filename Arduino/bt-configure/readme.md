@@ -1,6 +1,8 @@
 # Configuring HC-05
 
 - nahrajte daný sketch do Arduino
+- připojte modul HC-05 k arduinu
+- nabootujte modul HC-05 do konfiguračního módu (připojte napájení a přitom držte tlačítko na modulu HC-05 dokud nezačne pomalu blikat LED dioda)
 - otevřte sériovou konzoli s rychlostí 9600
 - jako sériovou konzoli můžete zvolit např. [Putty](https://www.putty.org/), [Termite](https://www.compuphase.com/software_termite.htm) nebo [Arduino IDE](https://www.arduino.cc/en/software) nebo [tera term](https://robotics.stackexchange.com/questions/2056/bluetooth-module-hc-05-giving-error-0#answer-3072)
 - ve vaší konzoli nastavte cr-lf (carriage return - line feed) a 9600 baudů a local echo
