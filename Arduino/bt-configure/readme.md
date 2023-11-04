@@ -7,6 +7,7 @@
 - vložte příkaz `AT` a odešlete pro zkontrolování komunikace
 - vložte příkaz `AT+NAME=[nové jméno zařízení bez diakritiky a mezer]` a odešlete pro změnu jména zařízení
 - vložte příkaz `AT+PSWD=[nové heslo]` a odešlete pro změnu hesla
+- (místo [] vložte hodnotu bez [])
 - změny můžete zkontrolovat příkazem `AT+NAME?` a `AT+PSWD?`
 
 - [více info](./HC-0305_serial_module_AT_commamd_set_201104_revised.pdf)
