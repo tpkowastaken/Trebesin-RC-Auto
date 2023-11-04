@@ -1,4 +1,4 @@
-package com.example.trebesin_rc_auto
+package com.tomprotiva.rc_auto
 
 import io.flutter.embedding.android.FlutterActivity
 
