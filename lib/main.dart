@@ -30,6 +30,37 @@ void bluetooth(BuildContext context) async {
   await Permission.bluetoothConnect.request();
   await Permission.bluetoothScan.request();
   await Permission.location.request();
+  if (await Permission.location.isDenied || await Permission.location.isRestricted || await Permission.location.isPermanentlyDenied) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Nemáte povolenou polohu. Nevíme proč, ale pro připojení k arduinu je potřeba povolení polohy...")));
+    }
+    return;
+  }
+  if (await Permission.bluetooth.isDenied || await Permission.bluetooth.isRestricted || await Permission.bluetooth.isPermanentlyDenied) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Nemáte povolený bluetooth (přístup k blízkým zařízením). Pro připojení k arduinu je potřeba povolení bluetooth...")));
+    }
+    return;
+  }
+  if (await Permission.bluetoothScan.isDenied || await Permission.bluetoothScan.isRestricted || await Permission.bluetoothScan.isPermanentlyDenied) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Nemáte povolený bluetooth (přístup k blízkým zařízením). Pro připojení k arduinu je potřeba povolení bluetooth...")));
+    }
+    return;
+  }
+  if (await Permission.bluetoothConnect.isDenied ||
+      await Permission.bluetoothConnect.isRestricted ||
+      await Permission.bluetoothConnect.isPermanentlyDenied) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Nemáte povolený bluetooth (přístup k blízkým zařízením). Pro připojení k arduinu je potřeba povolení bluetooth...")));
+    }
+    return;
+  }
+
   if (!context.mounted) return;
   final BluetoothDevice? selectedDevice = await Navigator.of(context).push(
     MaterialPageRoute(
