@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -182,7 +184,9 @@ Future<void> _sendPosData(BuildContext context, _MyHomePageState homepage) async
       }
       direction *= -1; //we messed up the direction of the steering and don't want to rewrite it all so we just flip it here
 
-      print("$speed|$direction");
+      if (kDebugMode) {
+        print("$speed|$direction");
+      }
       send("$speed|$direction");
     }
   }
@@ -258,6 +262,25 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         actions: [
+          IconButton(
+            onPressed: () async {
+              var packageInfo = await PackageInfo.fromPlatform();
+              if (!mounted) return;
+              showAboutDialog(
+                  context: context,
+                  applicationName: "RC Auto Třebešín",
+                  applicationLegalese: "© 2023 Tomáš Protiva a Matěj Verhaegen\nZveřejněno pod licencí MIT",
+                  applicationVersion: packageInfo.version,
+                  children: [
+                    ElevatedButton(
+                      onPressed: (() =>
+                          launchUrl(Uri.parse("https://github.com/tpkowastaken/Trebesin-RC-Auto"), mode: LaunchMode.externalApplication)),
+                      child: const Text("Zdrojový kód"),
+                    )
+                  ]);
+            },
+            icon: const Icon(Symbols.info_i_rounded),
+          ),
           IconButton(
             icon: Icon(color: connection?.isConnected ?? false ? Colors.green : Colors.red, Symbols.bluetooth),
             onPressed: () {
