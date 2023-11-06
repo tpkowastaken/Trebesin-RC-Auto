@@ -16,15 +16,24 @@ const double defaultGyroSensitivity = 1.58;
 const double defaultDeadZone = 0.2;
 
 BluetoothConnection? connection;
-void send(String text) async {
+Future<void> send(String text, {BluetoothConnection? customConnection}) async {
+  if (customConnection != null) {
+    customConnection.output.add(Uint8List.fromList(utf8.encode("$text\r\n")));
+    await customConnection.output.allSent;
+    return;
+  }
   connection?.output.add(Uint8List.fromList(utf8.encode("$text\r\n")));
   await connection?.output.allSent;
 }
 
-void bluetooth(BuildContext context) async {
-  if (connection != null) {
-    connection?.dispose();
-    connection = null;
+Future<void> bluetooth(BuildContext context) async {
+  BluetoothConnection? currentConnection = connection;
+  connection = null;
+  if (currentConnection != null) {
+    await Future.delayed(const Duration(milliseconds: 150));
+    await send("0.0|0.0", customConnection: currentConnection);
+    await Future.delayed(const Duration(milliseconds: 50));
+    currentConnection.dispose();
     return;
   }
   await Permission.bluetooth.request();
@@ -238,11 +247,15 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
-  void dispose() {
-    // Avoid memory leak (`setState` after dispose) and disconnect
-    if (connection != null) {
-      connection?.dispose();
-      connection = null;
+  void dispose() async {
+    BluetoothConnection? currentConnection = connection;
+    connection = null;
+    if (currentConnection != null) {
+      await Future.delayed(const Duration(milliseconds: 150));
+      await send("0.0|0.0", customConnection: currentConnection);
+      await Future.delayed(const Duration(milliseconds: 50));
+      currentConnection.dispose();
+      return;
     }
     super.dispose();
   }
