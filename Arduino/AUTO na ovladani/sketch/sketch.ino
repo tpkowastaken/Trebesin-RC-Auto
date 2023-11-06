@@ -55,10 +55,13 @@ void setup()
     Serial.begin(115200);
     delay(1000);
 }
+unsigned long lastMillis = 0;
+unsigned long currentMillis = 0;
 void loop()
 {
     if (readline(bluetooth.read(), buf, 80) > 0)
     {
+        lastMillis = millis();
         String str = String(buf);
         int splitIndex = str.indexOf("|");
         String speed = str.substring(0, splitIndex);
@@ -86,7 +89,20 @@ void loop()
         Serial.print(" angle: ");
         Serial.println(angle);
     }
-    if (ALLOWMOTOR)
+    currentMillis = millis();
+    if (currentMillis - lastMillis >= 1000)
+    {
+        speedForward = 0;
+        speedBackward = 0;
+        angle = DefaultAngle;
+        if (ALLOWMOTOR)
+        {
+            servo.write(angle);
+            analogWrite(motor_f, speedForward);
+            analogWrite(motor_b, speedBackward);
+        }
+    }
+    else if (ALLOWMOTOR)
     {
         servo.write(angle);
         analogWrite(motor_f, speedForward);
