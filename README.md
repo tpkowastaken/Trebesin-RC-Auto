@@ -1,16 +1,24 @@
-# trebesin_rc_auto
+# Rc Auto Třebešín
 
-A new Flutter project.
+Aplikace pro ovládání RC auta.
 
-## Getting Started
+# Jak to funguje?
 
-This project is a starting point for a Flutter application.
+- Aplikace komunikuje pomocí bluetooth do modulu HC-05, který je připojen k arduinu.
+- Tento modul přijímá příkazy a podle nich ovládá RC auto.
 
-A few resources to get you started if this is your first Flutter project:
+# Jak auto nastavit?
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- Ve složce arduino máte k dispozici dva sketche, jeden pro komunikaci s HC-05 modulem - nastavení jména a hesla
+- Druhý sketch je pro ovládání auta, ten nahrajte do arduina
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# Featury
+
+- Ovladání pomocí tlačítek
+- Ovládání pomocí gyroskopu
+
+## Kompilování
+
+Odstraňte klíče originálního autora tím, že přepíšete ['signingConfig signingConfigs.release'](https://github.com/tpkowastaken/Trebesin-RC-Auto/blob/d9893d8529f044708468c7ea1e8bf63dbc0ed8fe/android/app/build.gradle#L69) na `signingConfig signingConfigs.debug`, odstraněním [signing Keys](https://github.com/tpkowastaken/Trebesin-RC-Auto/blob/d9893d8529f044708468c7ea1e8bf63dbc0ed8fe/android/app/build.gradle#L24-L28) a odstraněním [signing Configs](https://github.com/tpkowastaken/Trebesin-RC-Auto/blob/d9893d8529f044708468c7ea1e8bf63dbc0ed8fe/android/app/build.gradle#L59-L66).
+
+Pro systém android stačí mít nainstalovaný [Flutter](https://docs.flutter.dev/get-started/install) a poté `flutter build apk` pro android na windows nebo `flutter build ipa` pro ios na macbooku. Aplikaci na IOS můžete nainstalovat pomocí [tohoto návodu](https://chrunos.com/install-ipa-on-iphone/)

@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,15 +16,24 @@ const double defaultGyroSensitivity = 1.58;
 const double defaultDeadZone = 0.2;
 
 BluetoothConnection? connection;
-void send(String text) async {
+Future<void> send(String text, {BluetoothConnection? customConnection}) async {
+  if (customConnection != null) {
+    customConnection.output.add(Uint8List.fromList(utf8.encode("$text\r\n")));
+    await customConnection.output.allSent;
+    return;
+  }
   connection?.output.add(Uint8List.fromList(utf8.encode("$text\r\n")));
   await connection?.output.allSent;
 }
 
-void bluetooth(BuildContext context) async {
-  if (connection != null) {
-    connection?.dispose();
-    connection = null;
+Future<void> bluetooth(BuildContext context) async {
+  BluetoothConnection? currentConnection = connection;
+  connection = null;
+  if (currentConnection != null) {
+    await Future.delayed(const Duration(milliseconds: 150));
+    await send("0.0|0.0", customConnection: currentConnection);
+    await Future.delayed(const Duration(milliseconds: 50));
+    currentConnection.dispose();
     return;
   }
   await Permission.bluetooth.request();
@@ -30,6 +41,37 @@ void bluetooth(BuildContext context) async {
   await Permission.bluetoothConnect.request();
   await Permission.bluetoothScan.request();
   await Permission.location.request();
+  if (await Permission.location.isDenied || await Permission.location.isRestricted || await Permission.location.isPermanentlyDenied) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Nemáte povolenou polohu. Nevíme proč, ale pro připojení k arduinu je potřeba povolení polohy...")));
+    }
+    return;
+  }
+  if (await Permission.bluetooth.isDenied || await Permission.bluetooth.isRestricted || await Permission.bluetooth.isPermanentlyDenied) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Nemáte povolený bluetooth (přístup k blízkým zařízením). Pro připojení k arduinu je potřeba povolení bluetooth...")));
+    }
+    return;
+  }
+  if (await Permission.bluetoothScan.isDenied || await Permission.bluetoothScan.isRestricted || await Permission.bluetoothScan.isPermanentlyDenied) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Nemáte povolený bluetooth (přístup k blízkým zařízením). Pro připojení k arduinu je potřeba povolení bluetooth...")));
+    }
+    return;
+  }
+  if (await Permission.bluetoothConnect.isDenied ||
+      await Permission.bluetoothConnect.isRestricted ||
+      await Permission.bluetoothConnect.isPermanentlyDenied) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Nemáte povolený bluetooth (přístup k blízkým zařízením). Pro připojení k arduinu je potřeba povolení bluetooth...")));
+    }
+    return;
+  }
+
   if (!context.mounted) return;
   final BluetoothDevice? selectedDevice = await Navigator.of(context).push(
     MaterialPageRoute(
@@ -151,7 +193,9 @@ Future<void> _sendPosData(BuildContext context, _MyHomePageState homepage) async
       }
       direction *= -1; //we messed up the direction of the steering and don't want to rewrite it all so we just flip it here
 
-      print("$speed|$direction");
+      if (kDebugMode) {
+        print("$speed|$direction");
+      }
       send("$speed|$direction");
     }
   }
@@ -203,11 +247,15 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
-  void dispose() {
-    // Avoid memory leak (`setState` after dispose) and disconnect
-    if (connection != null) {
-      connection?.dispose();
-      connection = null;
+  void dispose() async {
+    BluetoothConnection? currentConnection = connection;
+    connection = null;
+    if (currentConnection != null) {
+      await Future.delayed(const Duration(milliseconds: 150));
+      await send("0.0|0.0", customConnection: currentConnection);
+      await Future.delayed(const Duration(milliseconds: 50));
+      currentConnection.dispose();
+      return;
     }
     super.dispose();
   }
@@ -227,6 +275,25 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         actions: [
+          IconButton(
+            onPressed: () async {
+              var packageInfo = await PackageInfo.fromPlatform();
+              if (!mounted) return;
+              showAboutDialog(
+                  context: context,
+                  applicationName: "RC Auto Třebešín",
+                  applicationLegalese: "© 2023 Tomáš Protiva a Matěj Verhaegen\nZveřejněno pod licencí MIT",
+                  applicationVersion: packageInfo.version,
+                  children: [
+                    ElevatedButton(
+                      onPressed: (() =>
+                          launchUrl(Uri.parse("https://github.com/tpkowastaken/Trebesin-RC-Auto"), mode: LaunchMode.externalApplication)),
+                      child: const Text("Zdrojový kód"),
+                    )
+                  ]);
+            },
+            icon: const Icon(Symbols.info_i_rounded),
+          ),
           IconButton(
             icon: Icon(color: connection?.isConnected ?? false ? Colors.green : Colors.red, Symbols.bluetooth),
             onPressed: () {
