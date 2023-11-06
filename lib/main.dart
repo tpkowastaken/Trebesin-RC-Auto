@@ -12,7 +12,7 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'package:trebesin_rc_auto/select_bonded_device_page.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-const double defaultGyroSensitivity = 1.58;
+const double defaultGyroSensitivity = 1.5;
 const double defaultDeadZone = 0.2;
 
 BluetoothConnection? connection;
@@ -153,7 +153,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Trebesin RC Auto Ovladac',
       debugShowCheckedModeBanner: false,
-      //debugShowMaterialGrid: true,
+      debugShowMaterialGrid: true,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -212,12 +212,23 @@ class _MyHomePageState extends State<MyHomePage> {
   // double x = 0, y = 0;
   double z = 0;
   double buttonsZ = 0;
+  double rotationAngle = 90;
   String direction = "";
   double _speed = 0;
   double _deadZone = defaultDeadZone;
   bool steeringButtonsDissabled = true;
   bool ableToDrive = false;
   double _gyroSensitivity = defaultGyroSensitivity;
+
+  double calculateAdjustedRotation(double z, double deadZone, double sensitivity) {
+    if (z.abs() < deadZone) {
+      return 0.0; // Within the deadzone
+    } else {
+      // Calculate the rotation angle based on sensitivity, limited to 90 degrees
+      double limitedRotation = (z * -sensitivity).clamp(-90, 90);
+      return limitedRotation;
+    }
+  }
 
   @override
   void initState() {
@@ -311,19 +322,29 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           Center(
             child: Padding(
-              padding: const EdgeInsets.only(bottom: 25.0),
+              padding: const EdgeInsets.only(bottom: 10.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Icon(
-                      //max size possible
-                      size: 80,
-                      direction == "Left"
-                          ? Symbols.arrow_left_alt
-                          : direction == "Right"
-                              ? Symbols.arrow_right_alt
-                              : Symbols.arrow_upward,
+                  RotatedBox(
+                    quarterTurns: 3,
+                    child: TweenAnimationBuilder(
+                      duration: const Duration(milliseconds: 200), // Adjust animation duration as needed
+                      tween: Tween<double>(
+                        begin: rotationAngle,
+                        end: calculateAdjustedRotation(z, _deadZone, _gyroSensitivity),
+                      ),
+                      builder: (context, value, child) {
+                        rotationAngle = value;
+
+                        return Transform.rotate(
+                          angle: (value % 360) * (pi / 90), // Rotate between -90 and 90 degrees
+                          child: const Icon(
+                            Icons.arrow_forward,
+                            size: 100.0, // Adjust the arrow size as needed
+                          ),
+                        );
+                      },
                     ),
                   ),
                   ElevatedButton(
