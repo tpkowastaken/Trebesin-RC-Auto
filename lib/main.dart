@@ -224,9 +224,9 @@ class _MyHomePageState extends State<MyHomePage> {
     if (z.abs() < deadZone) {
       return 0.0; // Within the deadzone
     } else {
-      // Calculate the rotation angle based on sensitivity, limited to 90 degrees
-      double limitedRotation = (z * -sensitivity).clamp(-90, 90);
-      return limitedRotation;
+      // Calculate the rotation angle based on sensitivity and quadratic graph
+      double limitedRotation = z * -sensitivity * 45;
+      return limitedRotation.clamp(-45, 45);
     }
   }
 
@@ -338,7 +338,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         rotationAngle = value;
 
                         return Transform.rotate(
-                          angle: (value % 360) * (pi / 90), // Rotate between -90 and 90 degrees
+                          angle: (value % 180) * (pi / 90), // Rotate exactly 90 degrees to each side
                           child: const Icon(
                             Icons.arrow_forward,
                             size: 100.0, // Adjust the arrow size as needed
