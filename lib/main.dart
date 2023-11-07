@@ -13,7 +13,7 @@ import 'package:trebesin_rc_auto/select_bonded_device_page.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 const double defaultGyroSensitivity = 1.5;
-const double defaultDeadZone = 0.2;
+const double defaultDeadZone = 0;
 
 BluetoothConnection? connection;
 Future<void> send(String text, {BluetoothConnection? customConnection}) async {
@@ -153,7 +153,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Trebesin RC Auto Ovladac',
       debugShowCheckedModeBanner: false,
-      debugShowMaterialGrid: true,
+      //debugShowMaterialGrid: true,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -382,12 +382,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       },
                     ),
                   ),
-                  const Text("mrtvý bod: "),
+                  const Text("Mrtvý bod: "),
                   SizedBox(
                     width: 200,
                     height: 20,
                     child: Slider.adaptive(
                       thumbColor: Theme.of(context).colorScheme.primary,
+                      divisions: 10,
                       min: 0,
                       max: 1,
                       value: _deadZone,
