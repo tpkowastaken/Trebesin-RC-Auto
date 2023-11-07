@@ -360,11 +360,13 @@ class _MyHomePageState extends State<MyHomePage> {
                           min: 0.1,
                           max: 3,
                           value: _gyroSensitivity,
-                          onChanged: (value) {
-                            setState(() {
-                              _gyroSensitivity = value;
-                            });
-                          },
+                          onChanged: steeringButtonsDissabled
+                              ? (value) {
+                                  setState(() {
+                                    _gyroSensitivity = value;
+                                  });
+                                }
+                              : null,
                         ),
                       ),
                     ],
@@ -382,11 +384,13 @@ class _MyHomePageState extends State<MyHomePage> {
                           min: 0,
                           max: 1,
                           value: _deadZone,
-                          onChanged: (value) {
-                            setState(() {
-                              _deadZone = value;
-                            });
-                          },
+                          onChanged: steeringButtonsDissabled
+                              ? (value) {
+                                  setState(() {
+                                    _deadZone = value;
+                                  });
+                                }
+                              : null,
                         ),
                       ),
                     ],
