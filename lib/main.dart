@@ -269,6 +269,23 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         actions: [
           IconButton(
+            icon: Icon(
+              color: connection?.isConnected ?? false ? Colors.green : Colors.red,
+              Symbols.bluetooth,
+              size: 30,
+            ),
+            onPressed: () {
+              setState(() {
+                ableToDrive = false;
+              });
+              bluetooth(context);
+            },
+          ),
+          IconButton(
+            icon: const Icon(
+              Icons.info_outline_rounded,
+              size: 30,
+            ),
             onPressed: () async {
               var packageInfo = await PackageInfo.fromPlatform();
               if (!mounted) return;
@@ -284,16 +301,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: const Text("Zdrojový kód"),
                     )
                   ]);
-            },
-            icon: const Icon(Symbols.info_i_rounded),
-          ),
-          IconButton(
-            icon: Icon(color: connection?.isConnected ?? false ? Colors.green : Colors.red, Symbols.bluetooth),
-            onPressed: () {
-              setState(() {
-                ableToDrive = false;
-              });
-              bluetooth(context);
             },
           ),
         ],
