@@ -12,8 +12,8 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'package:trebesin_rc_auto/select_bonded_device_page.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-const double defaultGyroSensitivity = 1.58;
-const double defaultDeadZone = 0.2;
+const double defaultGyroSensitivity = 1.5;
+const double defaultDeadZone = 0;
 
 BluetoothConnection? connection;
 Future<void> send(String text, {BluetoothConnection? customConnection}) async {
@@ -212,12 +212,22 @@ class _MyHomePageState extends State<MyHomePage> {
   // double x = 0, y = 0;
   double z = 0;
   double buttonsZ = 0;
-  String direction = "";
+  double rotationAngle = 0;
   double _speed = 0;
   double _deadZone = defaultDeadZone;
+  double _gyroSensitivity = defaultGyroSensitivity;
   bool steeringButtonsDissabled = true;
   bool ableToDrive = false;
-  double _gyroSensitivity = defaultGyroSensitivity;
+
+  double calculateAdjustedRotation(double z, double deadZone, double sensitivity) {
+    if (z.abs() < deadZone) {
+      return 0.0; // Within the deadzone
+    } else {
+      // Calculate the rotation angle based on sensitivity and quadratic graph
+      double limitedRotation = z * -sensitivity * 45;
+      return limitedRotation.clamp(-45, 45);
+    }
+  }
 
   @override
   void initState() {
@@ -229,16 +239,9 @@ class _MyHomePageState extends State<MyHomePage> {
       //rough calculation, you can use
       //advance formula to calculate the orentation
       if (!ableToDrive || !steeringButtonsDissabled) {
-        direction = "Turned off";
         z = 0;
         setState(() {});
         return;
-      } else if (z + event.z > (_deadZone * pow(_gyroSensitivity, 2))) {
-        direction = "Left";
-      } else if (z + event.z < (-_deadZone * pow(_gyroSensitivity, 2))) {
-        direction = "Right";
-      } else {
-        direction = "Straight";
       }
       z += event.z;
       setState(() {});
@@ -262,20 +265,27 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (!steeringButtonsDissabled) {
-      if (buttonsZ > (_deadZone)) {
-        direction = "Left";
-      } else if (buttonsZ < (-_deadZone)) {
-        direction = "Right";
-      } else {
-        direction = "Straight";
-      }
-    }
-
     return Scaffold(
       appBar: AppBar(
         actions: [
           IconButton(
+            icon: Icon(
+              color: connection?.isConnected ?? false ? Colors.green : Colors.red,
+              Symbols.bluetooth,
+              size: 30,
+            ),
+            onPressed: () {
+              setState(() {
+                ableToDrive = false;
+              });
+              bluetooth(context);
+            },
+          ),
+          IconButton(
+            icon: const Icon(
+              Icons.info_outline_rounded,
+              size: 30,
+            ),
             onPressed: () async {
               var packageInfo = await PackageInfo.fromPlatform();
               if (!mounted) return;
@@ -292,16 +302,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     )
                   ]);
             },
-            icon: const Icon(Symbols.info_i_rounded),
-          ),
-          IconButton(
-            icon: Icon(color: connection?.isConnected ?? false ? Colors.green : Colors.red, Symbols.bluetooth),
-            onPressed: () {
-              setState(() {
-                ableToDrive = false;
-              });
-              bluetooth(context);
-            },
           ),
         ],
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -309,82 +309,102 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Stack(
         children: [
+          //arrow and settings
           Center(
             child: Padding(
-              padding: const EdgeInsets.only(bottom: 25.0),
+              padding: const EdgeInsets.only(bottom: 10.0),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Expanded(
-                    child: Icon(
-                      //max size possible
-                      size: 80,
-                      direction == "Left"
-                          ? Symbols.arrow_left_alt
-                          : direction == "Right"
-                              ? Symbols.arrow_right_alt
-                              : Symbols.arrow_upward,
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      //x = 0;
-                      //y = 0;
-                      setState(() {
-                        z = 0;
-                      });
-                    },
-                    child: const Text("Reset Středu Gyroskopu"),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _gyroSensitivity = defaultGyroSensitivity;
-                        _deadZone = defaultDeadZone;
-                      });
-                    },
-                    child: const Text("Reset nastavení Gyroskopu"),
-                  ),
-                  const Text("senzitivita: "),
-                  SizedBox(
-                    height: 20,
-                    width: 200,
-                    child: Slider.adaptive(
-                      thumbColor: Theme.of(context).colorScheme.primary,
-                      min: 0.1,
-                      max: 3,
-                      value: _gyroSensitivity,
-                      onChanged: (value) {
-                        setState(() {
-                          _gyroSensitivity = value;
-                        });
+                  RotatedBox(
+                    quarterTurns: 3,
+                    child: TweenAnimationBuilder(
+                      duration: const Duration(milliseconds: 200), // Adjust animation duration as needed
+                      tween: Tween<double>(
+                        begin: rotationAngle,
+                        end: calculateAdjustedRotation(z, _deadZone, _gyroSensitivity),
+                      ),
+                      builder: (context, value, child) {
+                        if (steeringButtonsDissabled) {
+                          rotationAngle = value;
+
+                          return Transform.rotate(
+                            angle: (value % 180) * (pi / 90), // Rotate exactly 90 degrees to each side
+                            child: const Icon(
+                              Icons.arrow_forward,
+                              size: 175.0, // Adjust the arrow size as needed
+                            ),
+                          );
+                        } else {
+                          value = buttonsZ;
+                          return Transform.rotate(
+                            angle: (value % 180) * (pi / 90), // Rotate exactly 90 degrees to each side
+                            child: const Icon(
+                              Icons.arrow_forward,
+                              size: 175.0, // Adjust the arrow size as needed
+                            ),
+                          );
+                        }
                       },
                     ),
                   ),
-                  const Text("mrtvý bod: "),
-                  SizedBox(
-                    width: 200,
-                    height: 20,
-                    child: Slider.adaptive(
-                      thumbColor: Theme.of(context).colorScheme.primary,
-                      min: 0,
-                      max: 1,
-                      value: _deadZone,
-                      onChanged: (value) {
-                        setState(() {
-                          _deadZone = value;
-                        });
-                      },
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("Sensitivity: "),
+                      SizedBox(
+                        height: 20,
+                        width: 200,
+                        child: Slider.adaptive(
+                          thumbColor: Theme.of(context).colorScheme.primary,
+                          min: 0.1,
+                          max: 3,
+                          value: _gyroSensitivity,
+                          onChanged: steeringButtonsDissabled
+                              ? (value) {
+                                  setState(() {
+                                    _gyroSensitivity = value;
+                                  });
+                                }
+                              : null,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("Deadzone size: "),
+                      SizedBox(
+                        width: 200,
+                        height: 20,
+                        child: Slider.adaptive(
+                          thumbColor: Theme.of(context).colorScheme.primary,
+                          divisions: 10,
+                          min: 0,
+                          max: 1,
+                          value: _deadZone,
+                          onChanged: steeringButtonsDissabled
+                              ? (value) {
+                                  setState(() {
+                                    _deadZone = value;
+                                  });
+                                }
+                              : null,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
           ),
+          //button rail & speed slider
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              //button rail
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: IntrinsicHeight(
@@ -433,11 +453,37 @@ class _MyHomePageState extends State<MyHomePage> {
                             });
                           },
                         ),
+                        //reset gyro 0-point
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              z = 0;
+                            });
+                          },
+                          icon: const Icon(
+                            Icons.auto_mode,
+                            size: 40,
+                          ),
+                        ),
+                        //reset gyro settings
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _gyroSensitivity = defaultGyroSensitivity;
+                              _deadZone = defaultDeadZone;
+                            });
+                          },
+                          icon: const Icon(
+                            Symbols.manage_history,
+                            size: 40,
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ),
               ),
+              //speed slider
               Stack(
                 alignment: Alignment.center,
                 children: [
@@ -524,17 +570,17 @@ class _MyHomePageState extends State<MyHomePage> {
                           GestureDetector(
                             onTapDown: (details) {
                               setState(() {
-                                buttonsZ += 1;
+                                buttonsZ = -45;
                               });
                             },
                             onTapUp: (details) {
                               setState(() {
-                                buttonsZ -= 1;
+                                buttonsZ = 0;
                               });
                             },
                             onTapCancel: () {
                               setState(() {
-                                buttonsZ -= 1;
+                                buttonsZ = 0;
                               });
                             },
                             child: const Icon(
@@ -547,17 +593,17 @@ class _MyHomePageState extends State<MyHomePage> {
                           GestureDetector(
                             onTapDown: (details) {
                               setState(() {
-                                buttonsZ -= 1;
+                                buttonsZ = 45;
                               });
                             },
                             onTapUp: (details) {
                               setState(() {
-                                buttonsZ += 1;
+                                buttonsZ = 0;
                               });
                             },
                             onTapCancel: () {
                               setState(() {
-                                buttonsZ += 1;
+                                buttonsZ = 0;
                               });
                             },
                             child: const Icon(
