@@ -351,7 +351,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Senzitivita: "),
+                      const Text("Sensitivity: "),
                       SizedBox(
                         height: 20,
                         width: 200,
@@ -374,7 +374,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Velikost mrtvého bodu: "),
+                      const Text("Deadzone size: "),
                       SizedBox(
                         width: 200,
                         height: 20,
