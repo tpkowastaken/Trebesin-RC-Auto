@@ -212,13 +212,12 @@ class _MyHomePageState extends State<MyHomePage> {
   // double x = 0, y = 0;
   double z = 0;
   double buttonsZ = 0;
-  double rotationAngle = 90;
-  String direction = "";
+  double rotationAngle = 0;
   double _speed = 0;
   double _deadZone = defaultDeadZone;
+  double _gyroSensitivity = defaultGyroSensitivity;
   bool steeringButtonsDissabled = true;
   bool ableToDrive = false;
-  double _gyroSensitivity = defaultGyroSensitivity;
 
   double calculateAdjustedRotation(double z, double deadZone, double sensitivity) {
     if (z.abs() < deadZone) {
@@ -240,16 +239,9 @@ class _MyHomePageState extends State<MyHomePage> {
       //rough calculation, you can use
       //advance formula to calculate the orentation
       if (!ableToDrive || !steeringButtonsDissabled) {
-        direction = "Turned off";
         z = 0;
         setState(() {});
         return;
-      } else if (z + event.z > (_deadZone * pow(_gyroSensitivity, 2))) {
-        direction = "Left";
-      } else if (z + event.z < (-_deadZone * pow(_gyroSensitivity, 2))) {
-        direction = "Right";
-      } else {
-        direction = "Straight";
       }
       z += event.z;
       setState(() {});
@@ -273,16 +265,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (!steeringButtonsDissabled) {
-      if (buttonsZ > (_deadZone)) {
-        direction = "Left";
-      } else if (buttonsZ < (-_deadZone)) {
-        direction = "Right";
-      } else {
-        direction = "Straight";
-      }
-    }
-
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -336,15 +318,26 @@ class _MyHomePageState extends State<MyHomePage> {
                         end: calculateAdjustedRotation(z, _deadZone, _gyroSensitivity),
                       ),
                       builder: (context, value, child) {
-                        rotationAngle = value;
+                        if (steeringButtonsDissabled) {
+                          rotationAngle = value;
 
-                        return Transform.rotate(
-                          angle: (value % 180) * (pi / 90), // Rotate exactly 90 degrees to each side
-                          child: const Icon(
-                            Icons.arrow_forward,
-                            size: 150.0, // Adjust the arrow size as needed
-                          ),
-                        );
+                          return Transform.rotate(
+                            angle: (value % 180) * (pi / 90), // Rotate exactly 90 degrees to each side
+                            child: const Icon(
+                              Icons.arrow_forward,
+                              size: 175.0, // Adjust the arrow size as needed
+                            ),
+                          );
+                        } else {
+                          value = buttonsZ;
+                          return Transform.rotate(
+                            angle: (value % 180) * (pi / 90), // Rotate exactly 90 degrees to each side
+                            child: const Icon(
+                              Icons.arrow_forward,
+                              size: 175.0, // Adjust the arrow size as needed
+                            ),
+                          );
+                        }
                       },
                     ),
                   ),
@@ -395,11 +388,12 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
           ),
-          //buttons & speed slider
+          //button rail & speed slider
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              //button rail
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: IntrinsicHeight(
@@ -478,6 +472,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
+              //speed slider
               Stack(
                 alignment: Alignment.center,
                 children: [
@@ -564,17 +559,17 @@ class _MyHomePageState extends State<MyHomePage> {
                           GestureDetector(
                             onTapDown: (details) {
                               setState(() {
-                                buttonsZ += 1;
+                                buttonsZ = -45;
                               });
                             },
                             onTapUp: (details) {
                               setState(() {
-                                buttonsZ -= 1;
+                                buttonsZ = 0;
                               });
                             },
                             onTapCancel: () {
                               setState(() {
-                                buttonsZ -= 1;
+                                buttonsZ = 0;
                               });
                             },
                             child: const Icon(
@@ -587,17 +582,17 @@ class _MyHomePageState extends State<MyHomePage> {
                           GestureDetector(
                             onTapDown: (details) {
                               setState(() {
-                                buttonsZ -= 1;
+                                buttonsZ = 45;
                               });
                             },
                             onTapUp: (details) {
                               setState(() {
-                                buttonsZ += 1;
+                                buttonsZ = 0;
                               });
                             },
                             onTapCancel: () {
                               setState(() {
-                                buttonsZ += 1;
+                                buttonsZ = 0;
                               });
                             },
                             child: const Icon(
