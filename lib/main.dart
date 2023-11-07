@@ -175,18 +175,19 @@ Future<void> _sendPosData(BuildContext context, _MyHomePageState homepage) async
     await Future.delayed(const Duration(milliseconds: 50));
     if (connection != null && connection!.isConnected) {
       num speed = homepage._speed;
-      num z = homepage.z;
+      num homepageZ = homepage.z;
       num direction = 0;
       if (homepage.steeringButtonsDissabled &&
-          (z < (homepage._deadZone * pow(homepage._gyroSensitivity, 2)) && z > (-homepage._deadZone * pow(homepage._gyroSensitivity, 2)))) {
+          (homepageZ < (homepage._deadZone * pow(homepage._gyroSensitivity, 2)) &&
+              homepageZ > (-homepage._deadZone * pow(homepage._gyroSensitivity, 2)))) {
         direction = 0;
       } else if (homepage.steeringButtonsDissabled) {
         num gyroSensitivity = homepage._gyroSensitivity;
         gyroSensitivity = pow(gyroSensitivity, 2);
         speed = speed.clamp(-1, 1);
-        z = z.clamp(gyroSensitivity * -1, gyroSensitivity);
-        bool positive = z >= 0;
-        direction = z.abs() / gyroSensitivity;
+        homepageZ = homepageZ.clamp(gyroSensitivity * -1, gyroSensitivity);
+        bool positive = homepageZ >= 0;
+        direction = homepageZ.abs() / gyroSensitivity;
         direction = positive ? direction : direction * -1;
       } else {
         direction = homepage.buttonsZ;
@@ -199,6 +200,29 @@ Future<void> _sendPosData(BuildContext context, _MyHomePageState homepage) async
       send("$speed|$direction");
     }
   }
+}
+
+double _calculateAdjustedRotation(_MyHomePageState homepage) {
+  num speed = homepage._speed;
+  num homepageZ = homepage.z;
+  num direction = 0;
+  if (homepage.steeringButtonsDissabled &&
+      (homepageZ < (homepage._deadZone * pow(homepage._gyroSensitivity, 2)) &&
+          homepageZ > (-homepage._deadZone * pow(homepage._gyroSensitivity, 2)))) {
+    direction = 0;
+  } else if (homepage.steeringButtonsDissabled) {
+    num gyroSensitivity = homepage._gyroSensitivity;
+    gyroSensitivity = pow(gyroSensitivity, 2);
+    speed = speed.clamp(-1, 1);
+    homepageZ = homepageZ.clamp(gyroSensitivity * -1, gyroSensitivity);
+    bool positive = homepageZ >= 0;
+    direction = homepageZ.abs() / gyroSensitivity;
+    direction = positive ? direction : direction * -1;
+  } else {
+    direction = homepage.buttonsZ;
+  }
+  direction *= -1; //we messed up the direction of the steering and don't want to rewrite it all so we just flip it here
+  return direction * 45;
 }
 
 class MyHomePage extends StatefulWidget {
@@ -216,18 +240,9 @@ class _MyHomePageState extends State<MyHomePage> {
   double _speed = 0;
   double _deadZone = defaultDeadZone;
   double _gyroSensitivity = defaultGyroSensitivity;
+  double _gyroSensitivityWidget = defaultGyroSensitivity;
   bool steeringButtonsDissabled = true;
   bool ableToDrive = false;
-
-  double calculateAdjustedRotation(double z, double deadZone, double sensitivity) {
-    if (z.abs() < deadZone) {
-      return 0.0; // Within the deadzone
-    } else {
-      // Calculate the rotation angle based on sensitivity and quadratic graph
-      double limitedRotation = z * -sensitivity * 45;
-      return limitedRotation.clamp(-45, 45);
-    }
-  }
 
   @override
   void initState() {
@@ -322,7 +337,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       duration: const Duration(milliseconds: 200), // Adjust animation duration as needed
                       tween: Tween<double>(
                         begin: rotationAngle,
-                        end: calculateAdjustedRotation(z, _deadZone, _gyroSensitivity),
+                        end: _calculateAdjustedRotation(this),
                       ),
                       builder: (context, value, child) {
                         if (steeringButtonsDissabled) {
@@ -359,10 +374,11 @@ class _MyHomePageState extends State<MyHomePage> {
                           thumbColor: Theme.of(context).colorScheme.primary,
                           min: 0.1,
                           max: 3,
-                          value: _gyroSensitivity,
+                          value: _gyroSensitivityWidget,
                           onChanged: (value) {
                             setState(() {
-                              _gyroSensitivity = value;
+                              _gyroSensitivity = 3.1 - value;
+                              _gyroSensitivityWidget = value;
                             });
                           },
                         ),
@@ -466,6 +482,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPressed: () {
                             setState(() {
                               _gyroSensitivity = defaultGyroSensitivity;
+                              _gyroSensitivityWidget = defaultGyroSensitivity;
                               _deadZone = defaultDeadZone;
                             });
                           },
