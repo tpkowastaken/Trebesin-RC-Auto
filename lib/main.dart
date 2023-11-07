@@ -320,11 +320,12 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Stack(
         children: [
+          //arrow and settings
           Center(
             child: Padding(
               padding: const EdgeInsets.only(bottom: 10.0),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   RotatedBox(
                     quarterTurns: 3,
@@ -341,68 +342,60 @@ class _MyHomePageState extends State<MyHomePage> {
                           angle: (value % 180) * (pi / 90), // Rotate exactly 90 degrees to each side
                           child: const Icon(
                             Icons.arrow_forward,
-                            size: 100.0, // Adjust the arrow size as needed
+                            size: 150.0, // Adjust the arrow size as needed
                           ),
                         );
                       },
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      //x = 0;
-                      //y = 0;
-                      setState(() {
-                        z = 0;
-                      });
-                    },
-                    child: const Text("Reset Středu Gyroskopu"),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("Senzitivita: "),
+                      SizedBox(
+                        height: 20,
+                        width: 200,
+                        child: Slider.adaptive(
+                          thumbColor: Theme.of(context).colorScheme.primary,
+                          min: 0.1,
+                          max: 3,
+                          value: _gyroSensitivity,
+                          onChanged: (value) {
+                            setState(() {
+                              _gyroSensitivity = value;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _gyroSensitivity = defaultGyroSensitivity;
-                        _deadZone = defaultDeadZone;
-                      });
-                    },
-                    child: const Text("Reset nastavení Gyroskopu"),
-                  ),
-                  const Text("senzitivita: "),
-                  SizedBox(
-                    height: 20,
-                    width: 200,
-                    child: Slider.adaptive(
-                      thumbColor: Theme.of(context).colorScheme.primary,
-                      min: 0.1,
-                      max: 3,
-                      value: _gyroSensitivity,
-                      onChanged: (value) {
-                        setState(() {
-                          _gyroSensitivity = value;
-                        });
-                      },
-                    ),
-                  ),
-                  const Text("Mrtvý bod: "),
-                  SizedBox(
-                    width: 200,
-                    height: 20,
-                    child: Slider.adaptive(
-                      thumbColor: Theme.of(context).colorScheme.primary,
-                      divisions: 10,
-                      min: 0,
-                      max: 1,
-                      value: _deadZone,
-                      onChanged: (value) {
-                        setState(() {
-                          _deadZone = value;
-                        });
-                      },
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("Velikost mrtvého bodu: "),
+                      SizedBox(
+                        width: 200,
+                        height: 20,
+                        child: Slider.adaptive(
+                          thumbColor: Theme.of(context).colorScheme.primary,
+                          divisions: 10,
+                          min: 0,
+                          max: 1,
+                          value: _deadZone,
+                          onChanged: (value) {
+                            setState(() {
+                              _deadZone = value;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
           ),
+          //buttons & speed slider
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -454,6 +447,31 @@ class _MyHomePageState extends State<MyHomePage> {
                               steeringButtonsDissabled = !steeringButtonsDissabled;
                             });
                           },
+                        ),
+                        //reset gyro 0-point
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              z = 0;
+                            });
+                          },
+                          icon: const Icon(
+                            Icons.auto_mode,
+                            size: 40,
+                          ),
+                        ),
+                        //reset gyro settings
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _gyroSensitivity = defaultGyroSensitivity;
+                              _deadZone = defaultDeadZone;
+                            });
+                          },
+                          icon: const Icon(
+                            Symbols.manage_history,
+                            size: 40,
+                          ),
                         ),
                       ],
                     ),
