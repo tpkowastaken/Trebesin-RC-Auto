@@ -1,3 +1,7 @@
+# 0.1.2
+
+- Přeházeny věci v UI
+
 # 0.1.1
 
 - Vylepšeno fungování odpojování od auta
