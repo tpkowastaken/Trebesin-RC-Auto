@@ -351,7 +351,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                           );
                         } else {
-                          value = buttonsZ * 45;
+                          value = buttonsZ * -45;
                           return Transform.rotate(
                             angle: (value % 180) * (pi / 90), // Rotate exactly 90 degrees to each side
                             child: const Icon(
