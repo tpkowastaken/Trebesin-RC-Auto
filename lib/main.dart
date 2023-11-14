@@ -351,7 +351,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                           );
                         } else {
-                          value = buttonsZ;
+                          value = buttonsZ * 45;
                           return Transform.rotate(
                             angle: (value % 180) * (pi / 90), // Rotate exactly 90 degrees to each side
                             child: const Icon(
@@ -583,17 +583,17 @@ class _MyHomePageState extends State<MyHomePage> {
                           GestureDetector(
                             onTapDown: (details) {
                               setState(() {
-                                buttonsZ = -45;
+                                buttonsZ += 1;
                               });
                             },
                             onTapUp: (details) {
                               setState(() {
-                                buttonsZ = 0;
+                                buttonsZ -= 1;
                               });
                             },
                             onTapCancel: () {
                               setState(() {
-                                buttonsZ = 0;
+                                buttonsZ -= 1;
                               });
                             },
                             child: const Icon(
@@ -606,17 +606,17 @@ class _MyHomePageState extends State<MyHomePage> {
                           GestureDetector(
                             onTapDown: (details) {
                               setState(() {
-                                buttonsZ = 45;
+                                buttonsZ -= 1;
                               });
                             },
                             onTapUp: (details) {
                               setState(() {
-                                buttonsZ = 0;
+                                buttonsZ += 1;
                               });
                             },
                             onTapCancel: () {
                               setState(() {
-                                buttonsZ = 0;
+                                buttonsZ += 1;
                               });
                             },
                             child: const Icon(
