@@ -31,7 +31,7 @@ Future<void> bluetooth(BuildContext context) async {
   connection = null;
   if (currentConnection != null) {
     await Future.delayed(const Duration(milliseconds: 150));
-    await send("0.0|0.0", customConnection: currentConnection);
+    await send("0|90", customConnection: currentConnection);
     await Future.delayed(const Duration(milliseconds: 50));
     currentConnection.dispose();
     return;
@@ -172,7 +172,7 @@ class MyApp extends StatelessWidget {
 Future<void> _sendPosData(BuildContext context, _MyHomePageState homepage) async {
   await Future.delayed(const Duration(seconds: 1));
   while (context.mounted) {
-    await Future.delayed(const Duration(milliseconds: 50));
+    await Future.delayed(Duration(milliseconds: homepage.milliseconds));
     if (connection != null && connection!.isConnected) {
       num speed = homepage._speed;
       num homepageZ = homepage.z;
@@ -194,10 +194,16 @@ Future<void> _sendPosData(BuildContext context, _MyHomePageState homepage) async
       }
       direction *= -1; //we messed up the direction of the steering and don't want to rewrite it all so we just flip it here
 
+      speed = speed * 255;
+      direction = direction * 50;
+      direction = 90 + direction;
+      int speedInt = speed.toInt();
+      int directionInt = direction.toInt();
+
       if (kDebugMode) {
-        print("$speed|$direction");
+        print("$speedInt|$directionInt");
       }
-      send("$speed|$direction");
+      send("$speedInt|$directionInt");
     }
   }
 }
@@ -234,6 +240,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   // double x = 0, y = 0;
+  int milliseconds = 25;
   double z = 0;
   double buttonsZ = 0;
   double rotationAngle = 0;
@@ -270,7 +277,7 @@ class _MyHomePageState extends State<MyHomePage> {
     connection = null;
     if (currentConnection != null) {
       await Future.delayed(const Duration(milliseconds: 150));
-      await send("0.0|0.0", customConnection: currentConnection);
+      await send("0|90", customConnection: currentConnection);
       await Future.delayed(const Duration(milliseconds: 50));
       currentConnection.dispose();
       return;
